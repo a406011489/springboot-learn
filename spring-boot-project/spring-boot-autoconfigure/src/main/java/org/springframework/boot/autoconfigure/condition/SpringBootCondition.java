@@ -29,12 +29,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Base of all {@link Condition} implementations used with Spring Boot. Provides sensible
- * logging to help the user diagnose what classes are loaded.
- *
- * @author Phillip Webb
- * @author Greg Turnquist
- * @since 1.0.0
+ * 是 Spring Boot 实现 Condition 的抽象类，且是 Spring Boot 所有 Condition 实现类的基类。
  */
 public abstract class SpringBootCondition implements Condition {
 

@@ -51,11 +51,15 @@ import org.springframework.data.repository.Repository;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
-@SpringBootConfiguration
-@EnableAutoConfiguration
+
+@Inherited // Java 自带的注解。使用此注解声明出来的自定义注解，在使用此自定义注解时，如果注解在类上面时，子类会自动继承此注解，否则的话，子类不会继承此注解。
+
+@SpringBootConfiguration // 标记这是一个 Spring Boot 配置类。
+
+@EnableAutoConfiguration // Spring Boot 自定义的注解，用于开启自动配置功能，是 spring-boot-autoconfigure 项目最核心的注解。
+
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) }) // Spring 自定义的注解,扫描指定路径下的 Component
 @ConfigurationPropertiesScan
 public @interface SpringBootApplication {
 
