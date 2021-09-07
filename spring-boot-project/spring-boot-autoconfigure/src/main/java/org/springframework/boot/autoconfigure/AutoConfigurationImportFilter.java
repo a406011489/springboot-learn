@@ -22,22 +22,8 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 
 /**
- * Filter that can be registered in {@code spring.factories} to limit the
- * auto-configuration classes considered. This interface is designed to allow fast removal
- * of auto-configuration classes before their bytecode is even read.
- * <p>
- * An {@link AutoConfigurationImportFilter} may implement any of the following
- * {@link org.springframework.beans.factory.Aware Aware} interfaces, and their respective
- * methods will be called prior to {@link #match}:
- * <ul>
- * <li>{@link EnvironmentAware}</li>
- * <li>{@link BeanFactoryAware}</li>
- * <li>{@link BeanClassLoaderAware}</li>
- * <li>{@link ResourceLoaderAware}</li>
- * </ul>
- *
- * @author Phillip Webb
- * @since 1.5.0
+ * 用于过滤掉无需自动引入的自动配置类（Configuration）。
+ * 因为自动配置类可能会很多，如果无需使用，而将字节码读取到内存中，这个是一种浪费。
  */
 @FunctionalInterface
 public interface AutoConfigurationImportFilter {

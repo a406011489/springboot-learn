@@ -31,10 +31,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Abstract base class for a {@link SpringBootCondition} that also implements
- * {@link AutoConfigurationImportFilter}.
- *
- * @author Phillip Webb
+ * 作为具有 AutoConfigurationImportFilter 功能的 SpringBootCondition 的抽象基类。
  */
 abstract class FilteringSpringBootCondition extends SpringBootCondition
 		implements AutoConfigurationImportFilter, BeanFactoryAware, BeanClassLoaderAware {
@@ -45,18 +42,32 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 	@Override
 	public boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata) {
+
+		// <1> 获得 ConditionEvaluationReport 对象
 		ConditionEvaluationReport report = ConditionEvaluationReport.find(this.beanFactory);
+
+		// <2> 执行批量的匹配，并返回匹配结果
 		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses, autoConfigurationMetadata);
+
+		// <3.1> 创建 match 数组
 		boolean[] match = new boolean[outcomes.length];
+
+		// <3.2> 遍历 outcomes 结果数组
 		for (int i = 0; i < outcomes.length; i++) {
-			match[i] = (outcomes[i] == null || outcomes[i].isMatch());
+			// <3.2.1> 赋值 match 数组
+			match[i] = (outcomes[i] == null || outcomes[i].isMatch()); // 如果返回结果结果为空，也认为匹配
+			// <3.2.2> 如果不匹配，打印日志和记录。
 			if (!match[i] && outcomes[i] != null) {
+				// 打印日志
 				logOutcome(autoConfigurationClasses[i], outcomes[i]);
+				// 记录
 				if (report != null) {
 					report.recordConditionEvaluation(autoConfigurationClasses[i], this, outcomes[i]);
 				}
 			}
 		}
+
+		// <3.3> 返回 match 数组
 		return match;
 	}
 

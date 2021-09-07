@@ -46,13 +46,16 @@ class OnClassCondition extends FilteringSpringBootCondition {
 	@Override
 	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
-		// Split the work and perform half in a background thread if more than one
-		// processor is available. Using a single additional thread seems to offer the
-		// best performance. More threads make things worse.
+		// <1> 在后台线程中将工作一分为二。原因是：
+		// * 使用单一附加线程，似乎提供了最好的性能。
+		// * 多个线程，使事情变得更糟
 		if (Runtime.getRuntime().availableProcessors() > 1) {
+			// <2.1> 将前一半，创建一个 OutcomesResolver 对象（新线程）
 			return resolveOutcomesThreaded(autoConfigurationClasses, autoConfigurationMetadata);
 		}
 		else {
+
+			// <2.2> 将后一半，创建一个 OutcomesResolver 对象
 			OutcomesResolver outcomesResolver = new StandardOutcomesResolver(autoConfigurationClasses, 0,
 					autoConfigurationClasses.length, autoConfigurationMetadata, getBeanClassLoader());
 			return outcomesResolver.resolveOutcomes();
