@@ -25,25 +25,9 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * An {@link ApplicationListener} that halts application startup if the system file
- * encoding does not match an expected value set in the environment. By default has no
- * effect, but if you set {@code spring.mandatory_file_encoding} (or some camelCase or
- * UPPERCASE variant of that) to the name of a character encoding (e.g. "UTF-8") then this
- * initializer throws an exception when the {@code file.encoding} System property does not
- * equal it.
- *
- * <p>
- * The System property {@code file.encoding} is normally set by the JVM in response to the
- * {@code LANG} or {@code LC_ALL} environment variables. It is used (along with other
- * platform-dependent variables keyed off those environment variables) to encode JVM
- * arguments as well as file names and paths. In most cases you can override the file
- * encoding System property on the command line (with standard JVM features), but also
- * consider setting the {@code LANG} environment variable to an explicit
- * character-encoding value (e.g. "en_GB.UTF-8").
- *
- * @author Dave Syer
- * @author Madhura Bhave
- * @since 1.0.0
+ * 在Spring Boot环境准备完成以后运行，获取环境中的系统环境参数，
+ * 检测当前系统环境的 file.encoding 和 spring.mandatory-file-encoding 设置的值是否一样，如果不一样则抛出异常；
+ * 如果不配置 spring.mandatory-file-encoding 则不检查。
  */
 public class FileEncodingApplicationListener
 		implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
@@ -58,9 +42,14 @@ public class FileEncodingApplicationListener
 	@Override
 	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
 		ConfigurableEnvironment environment = event.getEnvironment();
+
+		// 如果未配置，则不进行检查
 		if (!environment.containsProperty("spring.mandatory-file-encoding")) {
 			return;
 		}
+
+		// 比对系统变量的 `file.encoding` ，和环境变量的 `spring.mandatory-file-encoding` 。
+		// 如果不一致，抛出 IllegalStateException 异常
 		String encoding = System.getProperty("file.encoding");
 		String desired = environment.getProperty("spring.mandatory-file-encoding");
 		if (encoding != null && !desired.equalsIgnoreCase(encoding)) {

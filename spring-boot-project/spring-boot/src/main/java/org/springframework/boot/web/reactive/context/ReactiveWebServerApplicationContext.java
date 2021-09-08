@@ -32,11 +32,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.StringUtils;
 
 /**
- * A {@link GenericReactiveWebApplicationContext} that can be used to bootstrap itself
- * from a contained {@link ReactiveWebServerFactory} bean.
- *
- * @author Brian Clozel
- * @since 2.0.0
+ * 它提供 Reactive Web 环境的 Spring 容器。
  */
 public class ReactiveWebServerApplicationContext extends GenericReactiveWebApplicationContext
 		implements ConfigurableWebServerApplicationContext {

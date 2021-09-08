@@ -509,7 +509,7 @@ public class SpringApplication {
 		return getSpringFactoriesInstances(type, new Class<?>[] {});
 	}
 
-	// 获得指定类类对应的对象们。
+	// 获得指定类类对应的对象们。获得 ApplicationListener 集合。
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
 

@@ -26,14 +26,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link ApplicationContextInitializer} that sets the Spring
- * {@link ApplicationContext#getId() ApplicationContext ID}. The
- * {@code spring.application.name} property is used to create the ID. If the property is
- * not set {@code application} is used.
- *
- * @author Dave Syer
- * @author Andy Wilkinson
- * @since 1.0.0
+ * 实现 ApplicationContextInitializer、Ordered 接口，负责生成 Spring 容器的编号。
  */
 public class ContextIdApplicationContextInitializer
 		implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
@@ -51,16 +44,28 @@ public class ContextIdApplicationContextInitializer
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
+
+		// <1> 获得（创建） ContextId 对象
 		ContextId contextId = getContextId(applicationContext);
+
+		// <2> 设置到 applicationContext 中
 		applicationContext.setId(contextId.getId());
+
+		// <3> 注册到 contextId 到 Spring 容器中
 		applicationContext.getBeanFactory().registerSingleton(ContextId.class.getName(), contextId);
 	}
 
 	private ContextId getContextId(ConfigurableApplicationContext applicationContext) {
+
+		// 获得父 ApplicationContext 对象
 		ApplicationContext parent = applicationContext.getParent();
+
+		// 情况一，如果父 ApplicationContext 存在，且有对应的 ContextId 对象，则使用它生成当前容器的 ContextId 对象
 		if (parent != null && parent.containsBean(ContextId.class.getName())) {
 			return parent.getBean(ContextId.class).createChildId();
 		}
+
+		// 情况二，创建 ContextId 对象
 		return new ContextId(getApplicationId(applicationContext.getEnvironment()));
 	}
 
@@ -70,9 +75,9 @@ public class ContextIdApplicationContextInitializer
 	}
 
 	/**
-	 * The ID of a context.
+	 * Spring 容器编号的封装。
 	 */
-	class ContextId {
+	static class ContextId {
 
 		private final AtomicLong children = new AtomicLong(0);
 

@@ -30,27 +30,26 @@ import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.ResolvableType;
 
 /**
- * A {@link SmartApplicationListener} that reacts to
- * {@link ApplicationEnvironmentPreparedEvent environment prepared events} and to
- * {@link ApplicationFailedEvent failed events} by logging the classpath of the thread
- * context class loader (TCCL) at {@code DEBUG} level.
- *
- * @author Andy Wilkinson
- * @since 2.0.0
+ * 程序启动时，将 classpath 打印到 debug 日志，启动失败时 classpath 打印到 debug 日志。
  */
 public final class ClasspathLoggingApplicationListener implements GenericApplicationListener {
 
+	/**
+	 * 顺序
+	 */
 	private static final int ORDER = LoggingApplicationListener.DEFAULT_ORDER + 1;
 
 	private static final Log logger = LogFactory.getLog(ClasspathLoggingApplicationListener.class);
 
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+
+		// 如果是 ApplicationEnvironmentPreparedEvent 事件，说明启动成功，打印成功到 debug 日志中
 		if (logger.isDebugEnabled()) {
 			if (event instanceof ApplicationEnvironmentPreparedEvent) {
 				logger.debug("Application started with classpath: " + getClasspath());
 			}
-			else if (event instanceof ApplicationFailedEvent) {
+			else if (event instanceof ApplicationFailedEvent) { // 如果是 ApplicationFailedEvent 事件，说明启动失败，打印失败到 debug 日志中
 				logger.debug("Application failed to start with classpath: " + getClasspath());
 			}
 		}

@@ -39,11 +39,7 @@ import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 
 /**
- * {@link ApplicationContextInitializer} to create a shared
- * {@link CachingMetadataReaderFactory} between the
- * {@link ConfigurationClassPostProcessor} and Spring Boot.
- *
- * @author Phillip Webb
+ * 它会创建一个用于在 ConfigurationClassPostProcessor 和 Spring Boot 间共享的 CachingMetadataReaderFactory Bean 对象。
  */
 class SharedMetadataReaderFactoryContextInitializer
 		implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {

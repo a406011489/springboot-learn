@@ -26,12 +26,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.util.ClassUtils;
 
 /**
- * {@link ApplicationListener} that replaces the liquibase {@link ServiceLocator} with a
- * version that works with Spring Boot executable archives.
- *
- * @author Phillip Webb
- * @author Dave Syer
- * @since 1.0.0
+ * 实现 ApplicationListener 接口，初始化 Liquibase 的 ServiceLocator 对象。
  */
 public class LiquibaseServiceLocatorApplicationListener implements ApplicationListener<ApplicationStartingEvent> {
 

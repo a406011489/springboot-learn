@@ -19,12 +19,7 @@ package org.springframework.boot.web.context;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * SPI interface to be implemented by most if not all {@link WebServerApplicationContext
- * web server application contexts}. Provides facilities to configure the context, in
- * addition to the methods in the {WebServerApplicationContext} interface.
- *
- * @author Phillip Webb
- * @since 2.0.0
+ * 实现它后，可以获得管理 WebServer 的能力。
  */
 public interface ConfigurableWebServerApplicationContext
 		extends ConfigurableApplicationContext, WebServerApplicationContext {
