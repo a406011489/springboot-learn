@@ -26,12 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 /**
- * Strategy to load '.properties' files into a {@link PropertySource}.
- *
- * @author Dave Syer
- * @author Phillip Webb
- * @author Madhura Bhave
- * @since 1.0.0
+ * 实现 PropertySourceLoader 接口，加载 .xml 和 .properties 类型的配置文件。
  */
 public class PropertiesPropertySourceLoader implements PropertySourceLoader {
 

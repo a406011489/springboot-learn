@@ -29,27 +29,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link PropertySource} that returns a random value for any property that starts with
- * {@literal "random."}. Where the "unqualified property name" is the portion of the
- * requested property name beyond the "random." prefix, this {@link PropertySource}
- * returns:
- * <ul>
- * <li>When {@literal "int"}, a random {@link Integer} value, restricted by an optionally
- * specified range.</li>
- * <li>When {@literal "long"}, a random {@link Long} value, restricted by an optionally
- * specified range.</li>
- * <li>Otherwise, a {@code byte[]}.</li>
- * </ul>
- * The {@literal "random.int"} and {@literal "random.long"} properties supports a range
- * suffix whose syntax is:
- * <p>
- * {@code OPEN value (,max) CLOSE} where the {@code OPEN,CLOSE} are any character and
- * {@code value,max} are integers. If {@code max} is provided then {@code value} is the
- * minimum value and {@code max} is the maximum (exclusive).
- *
- * @author Dave Syer
- * @author Matt Benson
- * @since 1.0.0
+ * 提供随机值的 PropertySource 实现类。
  */
 public class RandomValuePropertySource extends PropertySource<Random> {
 
@@ -72,12 +52,16 @@ public class RandomValuePropertySource extends PropertySource<Random> {
 
 	@Override
 	public Object getProperty(String name) {
+
+		// <1> 必须以 random. 前缀
 		if (!name.startsWith(PREFIX)) {
 			return null;
 		}
 		if (logger.isTraceEnabled()) {
 			logger.trace("Generating random property for '" + name + "'");
 		}
+
+		// <2> 根据类型，获得随机值
 		return getRandomValue(name.substring(PREFIX.length()));
 	}
 

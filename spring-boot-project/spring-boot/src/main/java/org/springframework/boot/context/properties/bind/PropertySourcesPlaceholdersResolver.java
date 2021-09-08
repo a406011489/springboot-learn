@@ -25,11 +25,7 @@ import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.util.SystemPropertyUtils;
 
 /**
- * {@link PlaceholdersResolver} to resolve placeholders from {@link PropertySources}.
- *
- * @author Phillip Webb
- * @author Madhura Bhave
- * @since 2.0.0
+ * 实现 PropertySource 对应的值是占位符的解析器。
  */
 public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver {
 
@@ -71,6 +67,7 @@ public class PropertySourcesPlaceholdersResolver implements PlaceholdersResolver
 		return null;
 	}
 
+	// 获得 PropertySources 们
 	private static PropertySources getSources(Environment environment) {
 		Assert.notNull(environment, "Environment must not be null");
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment,

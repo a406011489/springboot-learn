@@ -21,21 +21,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 
 /**
- * Allows for customization of the application's {@link Environment} prior to the
- * application context being refreshed.
- * <p>
- * EnvironmentPostProcessor implementations have to be registered in
- * {@code META-INF/spring.factories}, using the fully qualified name of this class as the
- * key.
- * <p>
- * {@code EnvironmentPostProcessor} processors are encouraged to detect whether Spring's
- * {@link org.springframework.core.Ordered Ordered} interface has been implemented or if
- * the {@link org.springframework.core.annotation.Order @Order} annotation is present and
- * to sort instances accordingly if so prior to invocation.
+ * 在 Environment 加载完成之后，如果我们需要对其进行一些配置、增加一些自己的处理逻辑，那么请使用 EnvironmentPostProcessor 。
  *
- * @author Andy Wilkinson
- * @author Stephane Nicoll
- * @since 1.3.0
+ * 其实和BeanPostProcessor类似
  */
 @FunctionalInterface
 public interface EnvironmentPostProcessor {
