@@ -55,13 +55,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link LoggingSystem} for <a href="https://logback.qos.ch">logback</a>.
- *
- * @author Phillip Webb
- * @author Dave Syer
- * @author Andy Wilkinson
- * @author Ben Hale
- * @since 1.0.0
+ * 继承 Slf4JLoggingSystem 抽象类，基于 Logback 的 LoggingSystem 实现类。
  */
 public class LogbackLoggingSystem extends Slf4JLoggingSystem {
 

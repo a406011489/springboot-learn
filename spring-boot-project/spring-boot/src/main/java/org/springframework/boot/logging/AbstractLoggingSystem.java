@@ -30,11 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.SystemPropertyUtils;
 
 /**
- * Abstract base class for {@link LoggingSystem} implementations.
- *
- * @author Phillip Webb
- * @author Dave Syer
- * @since 1.0.0
+ * 继承 LoggingSystem 抽象类，是 LoggingSystem 的抽象基类。
  */
 public abstract class AbstractLoggingSystem extends LoggingSystem {
 
@@ -51,58 +47,76 @@ public abstract class AbstractLoggingSystem extends LoggingSystem {
 	public void beforeInitialize() {
 	}
 
+	// 提供模板化的初始化逻辑。
 	@Override
 	public void initialize(LoggingInitializationContext initializationContext, String configLocation, LogFile logFile) {
+
+		// <1> 有自定义的配置文件，则使用指定配置文件进行初始化
 		if (StringUtils.hasLength(configLocation)) {
 			initializeWithSpecificConfig(initializationContext, configLocation, logFile);
 			return;
 		}
+
+		// <2> 无自定义的配置文件，则使用约定配置文件进行初始化
 		initializeWithConventions(initializationContext, logFile);
 	}
 
+	// 使用指定配置文件进行初始化。
 	private void initializeWithSpecificConfig(LoggingInitializationContext initializationContext, String configLocation,
 			LogFile logFile) {
+
+		// <1> 获得配置文件（可能有占位符）
 		configLocation = SystemPropertyUtils.resolvePlaceholders(configLocation);
+
+		// <2> 加载配置文件
 		loadConfiguration(initializationContext, configLocation, logFile);
 	}
 
+	// 使用约定配置文件进行初始化。
 	private void initializeWithConventions(LoggingInitializationContext initializationContext, LogFile logFile) {
+
+		// <1> 获得约定配置文件
 		String config = getSelfInitializationConfig();
+
+		// <2> 如果获取到，结果 logFile 为空，则重新初始化
 		if (config != null && logFile == null) {
 			// self initialization has occurred, reinitialize in case of property changes
 			reinitialize(initializationContext);
 			return;
 		}
+
+		// <3> 如果获取不到，则尝试获得约定配置文件（带 spring 后缀）
 		if (config == null) {
 			config = getSpringInitializationConfig();
 		}
+
+		// <4> 如果获取到，则加载配置文件
 		if (config != null) {
 			loadConfiguration(initializationContext, config, logFile);
 			return;
 		}
+
+		// <5> 如果获取不到，则加载默认配置
 		loadDefaults(initializationContext, logFile);
 	}
 
 	/**
-	 * Return any self initialization config that has been applied. By default this method
-	 * checks {@link #getStandardConfigLocations()} and assumes that any file that exists
-	 * will have been applied.
-	 * @return the self initialization config or {@code null}
+	 * 获得约定配置文件。
 	 */
 	protected String getSelfInitializationConfig() {
 		return findConfig(getStandardConfigLocations());
 	}
 
 	/**
-	 * Return any spring specific initialization config that should be applied. By default
-	 * this method checks {@link #getSpringConfigLocations()}.
-	 * @return the spring initialization config or {@code null}
+	 * 尝试获得约定配置文件（带 -spring 后缀）。
 	 */
 	protected String getSpringInitializationConfig() {
 		return findConfig(getSpringConfigLocations());
 	}
 
 	private String findConfig(String[] locations) {
+
+		// 遍历 locations 数组，逐个判断是否存在。若存在，则返回
 		for (String location : locations) {
 			ClassPathResource resource = new ClassPathResource(location, this.classLoader);
 			if (resource.exists()) {
@@ -113,9 +127,8 @@ public abstract class AbstractLoggingSystem extends LoggingSystem {
 	}
 
 	/**
-	 * Return the standard config locations for this system.
-	 * @return the standard config locations
-	 * @see #getSelfInitializationConfig()
+	 * 获得约定的配置文件。
+	 * 例如说：LogbackLoggingSystem 返回的是 "logback-test.groovy"、"logback-test.xml"、 "logback.groovy"、"logback.xml" 。
 	 */
 	protected abstract String[] getStandardConfigLocations();
 
@@ -178,9 +191,7 @@ public abstract class AbstractLoggingSystem extends LoggingSystem {
 	}
 
 	/**
-	 * Maintains a mapping between native levels and {@link LogLevel}.
-	 *
-	 * @param <T> the native level type
+	 * 是 AbstractLoggingSystem 的内部静态类，用于 Spring Boot LogLevel 和日志框架的 LogLevel 做映射。
 	 */
 	protected static class LogLevels<T> {
 

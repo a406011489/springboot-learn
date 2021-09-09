@@ -21,14 +21,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 
 /**
- * {@link ImportBeanDefinitionRegistrar} for binding externalized application properties
- * to {@link ConfigurationProperties @ConfigurationProperties} beans.
- *
- * @author Dave Syer
- * @author Phillip Webb
- * @since 1.0.0
- * @deprecated since 2.2.0 in favor of
- * {@link EnableConfigurationProperties @EnableConfigurationProperties}
+ * 将配置文件注入到 @ConfigurationProperties 注解的 Bean 的属性中。
  */
 @Deprecated
 public class ConfigurationPropertiesBindingPostProcessorRegistrar implements ImportBeanDefinitionRegistrar {

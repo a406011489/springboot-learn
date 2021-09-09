@@ -26,17 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 /**
- * Enable support for {@link ConfigurationProperties @ConfigurationProperties} annotated
- * beans. {@code @ConfigurationProperties} beans can be registered in the standard way
- * (for example using {@link Bean @Bean} methods) or, for convenience, can be specified
- * directly on this annotation.
- *
- * @author Dave Syer
- * @since 1.0.0
+ * 可以将指定带有 @ConfigurationProperties 的类，注册成 BeanDefinition ，从而创建成 Bean 对象。
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+// 从 @Import 注解上，可以看到使用 EnableConfigurationPropertiesImportSelector 处理。
 @Import(EnableConfigurationPropertiesRegistrar.class)
 public @interface EnableConfigurationProperties {
 

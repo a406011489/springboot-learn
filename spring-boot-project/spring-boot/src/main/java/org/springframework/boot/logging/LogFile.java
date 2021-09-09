@@ -25,15 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * A reference to a log output file. Log output files are specified using
- * {@code logging.file.name} or {@code logging.file.path} {@link Environment} properties.
- * If the {@code logging.file.name} property is not specified {@code "spring.log"} will be
- * written in the {@code logging.file.path} directory.
- *
- * @author Phillip Webb
- * @author Christian Carriere-Tisseur
- * @since 1.2.1
- * @see #get(PropertyResolver)
+ * 日志文件。
  */
 public class LogFile {
 
@@ -67,8 +59,14 @@ public class LogFile {
 	 */
 	public static final String FILE_PATH_PROPERTY = "logging.file.path";
 
+	/**
+	 * 文件名
+	 */
 	private final String file;
 
+	/**
+	 * 文件路径
+	 */
 	private final String path;
 
 	/**
@@ -91,7 +89,7 @@ public class LogFile {
 	}
 
 	/**
-	 * Apply log file details to {@code LOG_PATH} and {@code LOG_FILE} system properties.
+	 * 应用 file、path 到系统属性。
 	 */
 	public void applyToSystemProperties() {
 		applyTo(System.getProperties());

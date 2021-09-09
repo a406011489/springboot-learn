@@ -27,10 +27,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Abstract base class for {@link LoggingSystem} implementations that utilize SLF4J.
- *
- * @author Andy Wilkinson
- * @since 1.2.0
+ * 继承 AbstractLoggingSystem 抽象类，基于 Slf4J 的 LoggingSystem 的抽象基类。
  */
 public abstract class Slf4JLoggingSystem extends AbstractLoggingSystem {
 
@@ -43,6 +40,8 @@ public abstract class Slf4JLoggingSystem extends AbstractLoggingSystem {
 	@Override
 	public void beforeInitialize() {
 		super.beforeInitialize();
+
+		// <1> 配置 JUL 的桥接处理器
 		configureJdkLoggingBridgeHandler();
 	}
 
@@ -64,8 +63,13 @@ public abstract class Slf4JLoggingSystem extends AbstractLoggingSystem {
 
 	private void configureJdkLoggingBridgeHandler() {
 		try {
+			// <1> 判断 JUL 是否桥接到 SLF4J 了
 			if (isBridgeJulIntoSlf4j()) {
+
+				// <2> 移除 JUL 桥接处理器
 				removeJdkLoggingBridgeHandler();
+
+				// <3> 重新安装 SLF4JBridgeHandler
 				SLF4JBridgeHandler.install();
 			}
 		}
@@ -95,7 +99,10 @@ public abstract class Slf4JLoggingSystem extends AbstractLoggingSystem {
 
 	private void removeJdkLoggingBridgeHandler() {
 		try {
+			// 移除
 			removeDefaultRootHandler();
+
+			// 卸载
 			SLF4JBridgeHandler.uninstall();
 		}
 		catch (Throwable ex) {

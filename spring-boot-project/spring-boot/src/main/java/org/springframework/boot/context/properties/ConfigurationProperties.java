@@ -25,23 +25,11 @@ import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 
 /**
- * Annotation for externalized configuration. Add this to a class definition or a
- * {@code @Bean} method in a {@code @Configuration} class if you want to bind and validate
- * some external Properties (e.g. from a .properties file).
- * <p>
- * Binding is either performed by calling setters on the annotated class or, if
- * {@link ConstructorBinding @ConstructorBinding} is in use, by binding to the constructor
- * parameters.
- * <p>
- * Note that contrary to {@code @Value}, SpEL expressions are not evaluated since property
- * values are externalized.
+ * 如何将配置文件自动设置到被注解的类。
  *
- * @author Dave Syer
- * @since 1.0.0
- * @see ConfigurationPropertiesScan
- * @see ConstructorBinding
- * @see ConfigurationPropertiesBindingPostProcessor
- * @see EnableConfigurationProperties
+ * 总的来说是两种方法
+ * 第一种，@Component + @ConfigurationProperties 。
+ * 第二种，@EnableConfigurationProperties + ConfigurationProperties 。
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

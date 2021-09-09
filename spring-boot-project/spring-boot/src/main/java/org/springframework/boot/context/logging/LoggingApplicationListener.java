@@ -56,37 +56,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * An {@link ApplicationListener} that configures the {@link LoggingSystem}. If the
- * environment contains a {@code logging.config} property it will be used to bootstrap the
- * logging system, otherwise a default configuration is used. Regardless, logging levels
- * will be customized if the environment contains {@code logging.level.*} entries and
- * logging groups can be defined with {@code logging.group}.
- * <p>
- * Debug and trace logging for Spring, Tomcat, Jetty and Hibernate will be enabled when
- * the environment contains {@code debug} or {@code trace} properties that aren't set to
- * {@code "false"} (i.e. if you start your application using
- * {@literal java -jar myapp.jar [--debug | --trace]}). If you prefer to ignore these
- * properties you can set {@link #setParseArgs(boolean) parseArgs} to {@code false}.
- * <p>
- * By default, log output is only written to the console. If a log file is required, the
- * {@code logging.file.path} and {@code logging.file.name} properties can be used.
- * <p>
- * Some system properties may be set as side effects, and these can be useful if the
- * logging configuration supports placeholders (i.e. log4j or logback):
- * <ul>
- * <li>{@code LOG_FILE} is set to the value of path of the log file that should be written
- * (if any).</li>
- * <li>{@code PID} is set to the value of the current process ID if it can be determined.
- * </li>
- * </ul>
- *
- * @author Dave Syer
- * @author Phillip Webb
- * @author Andy Wilkinson
- * @author Madhura Bhave
- * @author HaiTao Zhang
- * @since 2.0.0
- * @see LoggingSystem#get(ClassLoader)
+ * 实现 GenericApplicationListener 接口，实现根据配置初始化日志系统 Logger 。
  */
 public class LoggingApplicationListener implements GenericApplicationListener {
 
@@ -192,11 +162,13 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 
 	private LogLevel springBootLogging = null;
 
+	// 判断是否是支持的事件类型。
 	@Override
 	public boolean supportsEventType(ResolvableType resolvableType) {
 		return isAssignableFrom(resolvableType.getRawClass(), EVENT_TYPES);
 	}
 
+	// 判断是否是支持的事件来源。
 	@Override
 	public boolean supportsSourceType(Class<?> sourceType) {
 		return isAssignableFrom(sourceType, SOURCE_TYPES);
@@ -213,28 +185,43 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 		return false;
 	}
 
+	// 处理事件。
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+
+		// 在 Spring Boot 应用启动的时候
 		if (event instanceof ApplicationStartingEvent) {
 			onApplicationStartingEvent((ApplicationStartingEvent) event);
 		}
+
+		// 在 Spring Boot 的 Environment 环境准备完成的时候
 		else if (event instanceof ApplicationEnvironmentPreparedEvent) {
 			onApplicationEnvironmentPreparedEvent((ApplicationEnvironmentPreparedEvent) event);
 		}
+
+		// 在 Spring Boot 容器的准备工作已经完成（并未启动）的时候
 		else if (event instanceof ApplicationPreparedEvent) {
 			onApplicationPreparedEvent((ApplicationPreparedEvent) event);
 		}
+
+		// 在 Spring Boot 容器关闭的时候
 		else if (event instanceof ContextClosedEvent
 				&& ((ContextClosedEvent) event).getApplicationContext().getParent() == null) {
 			onContextClosedEvent();
 		}
+
+		// 在 Spring Boot 容器启动失败的时候
 		else if (event instanceof ApplicationFailedEvent) {
 			onApplicationFailedEvent();
 		}
 	}
 
 	private void onApplicationStartingEvent(ApplicationStartingEvent event) {
+
+		// <1> 创建 LoggingSystem 对象
 		this.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());
+
+		// <2> LoggingSystem 的初始化的前置处理
 		this.loggingSystem.beforeInitialize();
 	}
 
@@ -242,9 +229,11 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 		if (this.loggingSystem == null) {
 			this.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());
 		}
+		// 初始化
 		initialize(event.getEnvironment(), event.getSpringApplication().getClassLoader());
 	}
 
+	// 将创建的 LoggingSystem 对象，注册到 Spring 容器中。
 	private void onApplicationPreparedEvent(ApplicationPreparedEvent event) {
 		ConfigurableListableBeanFactory beanFactory = event.getApplicationContext().getBeanFactory();
 		if (!beanFactory.containsBean(LOGGING_SYSTEM_BEAN_NAME)) {
@@ -277,18 +266,34 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 	 * @param classLoader the classloader
 	 */
 	protected void initialize(ConfigurableEnvironment environment, ClassLoader classLoader) {
+
+		// <1> 初始化 LoggingSystemProperties 配置
 		new LoggingSystemProperties(environment).apply();
+
+		// <2> 初始化 LogFile
 		this.logFile = LogFile.get(environment);
 		if (this.logFile != null) {
 			this.logFile.applyToSystemProperties();
 		}
+
 		this.loggerGroups = new LoggerGroups(DEFAULT_GROUP_LOGGERS);
+
+		// <3> 初始化早期的 Spring Boot Logging 级别
 		initializeEarlyLoggingLevel(environment);
+
+		// <4> 初始化 LoggingSystem 日志系统
 		initializeSystem(environment, this.loggingSystem, this.logFile);
+
+		// <5> 初始化最终的 Spring Boot Logging 级别
 		initializeFinalLoggingLevels(environment, this.loggingSystem);
+
+		// 注册 ShutdownHook 。注册钩子方法
 		registerShutdownHookIfNecessary(environment, this.loggingSystem);
 	}
 
+	// 初始化早期的 Spring Boot Logging 级别。
+	// 可以通过在启动 jar 的时候，跟上 --debug 或 --trace 。
+	// 也可以在配置文件中，添加 debug=true 或 trace=true 。
 	private void initializeEarlyLoggingLevel(ConfigurableEnvironment environment) {
 		if (this.parseArgs && this.springBootLogging == null) {
 			if (isSet(environment, "debug")) {
@@ -305,12 +310,20 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 		return (value != null && !value.equals("false"));
 	}
 
+	// 初始化 LoggingSystem 日志系统。
 	private void initializeSystem(ConfigurableEnvironment environment, LoggingSystem system, LogFile logFile) {
+
+		// <1> 创建 LoggingInitializationContext 对象
 		LoggingInitializationContext initializationContext = new LoggingInitializationContext(environment);
+
+		// <2> 获得日志组件的配置文件
 		String logConfig = environment.getProperty(CONFIG_PROPERTY);
+
+		// <3> 如果没配置，则直接初始化 LoggingSystem
 		if (ignoreLogConfig(logConfig)) {
 			system.initialize(initializationContext, null, logFile);
 		}
+		// <3> 如果有配置，先尝试加载指定配置文件，然后在初始化 LoggingSystem
 		else {
 			try {
 				ResourceUtils.getURL(logConfig).openStream().close();
@@ -329,11 +342,16 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 		return !StringUtils.hasLength(logConfig) || logConfig.startsWith("-D");
 	}
 
+	// 初始化最终的 Spring Boot Logging 级别。
 	private void initializeFinalLoggingLevels(ConfigurableEnvironment environment, LoggingSystem system) {
 		bindLoggerGroups(environment);
+
+		// <1> 如果 springBootLogging 非空，则设置到日志级别
 		if (this.springBootLogging != null) {
 			initializeLogLevel(system, this.springBootLogging);
 		}
+
+		// <2> 设置 environment 中配置的日志级别
 		setLogLevels(system, environment);
 	}
 
@@ -386,10 +404,7 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 	}
 
 	/**
-	 * Set logging levels based on relevant {@link Environment} properties.
-	 * @param system the logging system
-	 * @param environment the environment
-	 * @since 2.2.0
+	 * 设置 environment 中配置的日志级别。
 	 */
 	protected void setLogLevels(LoggingSystem system, ConfigurableEnvironment environment) {
 		BiConsumer<String, LogLevel> customizer = getLogLevelConfigurer(system);
@@ -422,9 +437,18 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 	}
 
 	private void registerShutdownHookIfNecessary(Environment environment, LoggingSystem loggingSystem) {
+
+		// 获得 logging.register-shutdown-hook 对应的配置值
 		boolean registerShutdownHook = environment.getProperty(REGISTER_SHUTDOWN_HOOK_PROPERTY, Boolean.class, false);
+
+		// 如果开启
 		if (registerShutdownHook) {
+
+			// <x> 获得 shutdownHandler 钩子
+			// 所注册的 ShutdownHook ，通过调用 LoggingSystem#getShutdownHandler() 方法，进行获得。
 			Runnable shutdownHandler = loggingSystem.getShutdownHandler();
+
+			// 注册 ShutdownHook
 			if (shutdownHandler != null && shutdownHookRegistered.compareAndSet(false, true)) {
 				registerShutdownHook(new Thread(shutdownHandler));
 			}

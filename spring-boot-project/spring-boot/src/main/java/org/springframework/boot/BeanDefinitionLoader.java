@@ -47,26 +47,38 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Loads bean definitions from underlying sources, including XML and JavaConfig. Acts as a
- * simple facade over {@link AnnotatedBeanDefinitionReader},
- * {@link XmlBeanDefinitionReader} and {@link ClassPathBeanDefinitionScanner}. See
- * {@link SpringApplication} for the types of sources that are supported.
- *
- * @author Phillip Webb
- * @see #setBeanNameGenerator(BeanNameGenerator)
+ * BeanDefinition 加载器（Loader），负责 Spring Boot 中，读取 BeanDefinition 。
  */
 class BeanDefinitionLoader {
 
+	/**
+	 * 来源的数组
+	 */
 	private final Object[] sources;
 
+	/**
+	 * 注解的 BeanDefinition 读取器
+	 */
 	private final AnnotatedBeanDefinitionReader annotatedReader;
 
+	/**
+	 * XML 的 BeanDefinition 读取器
+	 */
 	private final XmlBeanDefinitionReader xmlReader;
 
+	/**
+	 * Groovy 的 BeanDefinition 读取器
+	 */
 	private BeanDefinitionReader groovyReader;
 
+	/**
+	 * Classpath 的 BeanDefinition 扫描器
+	 */
 	private final ClassPathBeanDefinitionScanner scanner;
 
+	/**
+	 * 资源加载器
+	 */
 	private ResourceLoader resourceLoader;
 
 	/**
@@ -79,11 +91,19 @@ class BeanDefinitionLoader {
 		Assert.notNull(registry, "Registry must not be null");
 		Assert.notEmpty(sources, "Sources must not be empty");
 		this.sources = sources;
+
+		// 创建 AnnotatedBeanDefinitionReader 对象
 		this.annotatedReader = new AnnotatedBeanDefinitionReader(registry);
+
+		// 创建 XmlBeanDefinitionReader 对象
 		this.xmlReader = new XmlBeanDefinitionReader(registry);
+
+		// 创建 GroovyBeanDefinitionReader 对象
 		if (isGroovyPresent()) {
 			this.groovyReader = new GroovyBeanDefinitionReader(registry);
 		}
+
+		// 创建 ClassPathBeanDefinitionScanner 对象
 		this.scanner = new ClassPathBeanDefinitionScanner(registry);
 		this.scanner.addExcludeFilter(new ClassExcludeFilter(sources));
 	}
@@ -130,6 +150,7 @@ class BeanDefinitionLoader {
 		return count;
 	}
 
+	// 执行 BeanDefinition 加载。
 	private int load(Object source) {
 		Assert.notNull(source, "Source must not be null");
 		if (source instanceof Class<?>) {
@@ -147,6 +168,7 @@ class BeanDefinitionLoader {
 		throw new IllegalArgumentException("Invalid source type " + source.getClass());
 	}
 
+	// 按照 source 是 Class > Resource > Package 的顺序，尝试加载。
 	private int load(Class<?> source) {
 		if (isGroovyPresent() && GroovyBeanDefinitionSource.class.isAssignableFrom(source)) {
 			// Any GroovyLoaders added in beans{} DSL can contribute beans here

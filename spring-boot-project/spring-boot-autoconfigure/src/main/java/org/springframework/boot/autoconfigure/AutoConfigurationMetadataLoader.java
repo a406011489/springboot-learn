@@ -27,9 +27,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Internal utility used to load {@link AutoConfigurationMetadata}.
- *
- * @author Phillip Webb
+ * 加载自动配置类（AutoConfiguration）的元数据
  */
 final class AutoConfigurationMetadataLoader {
 
