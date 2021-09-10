@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 加载自动配置类（AutoConfiguration）的元数据
+ * 打个卡
  */
 final class AutoConfigurationMetadataLoader {
 
