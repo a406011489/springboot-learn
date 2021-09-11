@@ -43,6 +43,8 @@ import org.springframework.core.annotation.AliasFor;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+
+// @Configuration注解是Spring框架提供的，表示当前类为一个配置类（XML配置文件的注解表现形式），并可以被组件扫描器扫描。
 @Configuration(proxyBeanMethods = false)
 public @interface SpringBootConfiguration {
 

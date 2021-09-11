@@ -34,46 +34,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 
 /**
- * Enable auto-configuration of the Spring Application Context, attempting to guess and
- * configure beans that you are likely to need. Auto-configuration classes are usually
- * applied based on your classpath and what beans you have defined. For example, if you
- * have {@code tomcat-embedded.jar} on your classpath you are likely to want a
- * {@link TomcatServletWebServerFactory} (unless you have defined your own
- * {@link ServletWebServerFactory} bean).
- * <p>
- * When using {@link SpringBootApplication @SpringBootApplication}, the auto-configuration
- * of the context is automatically enabled and adding this annotation has therefore no
- * additional effect.
- * <p>
- * Auto-configuration tries to be as intelligent as possible and will back-away as you
- * define more of your own configuration. You can always manually {@link #exclude()} any
- * configuration that you never want to apply (use {@link #excludeName()} if you don't
- * have access to them). You can also exclude them via the
- * {@code spring.autoconfigure.exclude} property. Auto-configuration is always applied
- * after user-defined beans have been registered.
- * <p>
- * The package of the class that is annotated with {@code @EnableAutoConfiguration},
- * usually via {@code @SpringBootApplication}, has specific significance and is often used
- * as a 'default'. For example, it will be used when scanning for {@code @Entity} classes.
- * It is generally recommended that you place {@code @EnableAutoConfiguration} (if you're
- * not using {@code @SpringBootApplication}) in a root package so that all sub-packages
- * and classes can be searched.
- * <p>
- * Auto-configuration classes are regular Spring {@link Configuration @Configuration}
- * beans. They are located using the {@link SpringFactoriesLoader} mechanism (keyed
- * against this class). Generally auto-configuration beans are
- * {@link Conditional @Conditional} beans (most often using
- * {@link ConditionalOnClass @ConditionalOnClass} and
- * {@link ConditionalOnMissingBean @ConditionalOnMissingBean} annotations).
+ * 这个注解是一个组合注解，Spring中有很多以Enable开头的注解，
+ * 其作用就是借助@Import来收集并注册特定场景相关的bean，并加载到IoC容器。
+ * EnableAutoConfiguration就是借助@Import来收集所有符合自动配置条件的bean定义，并加载到IoC容器。
  *
- * @author Phillip Webb
- * @author Stephane Nicoll
- * @since 1.0.0
- * @see ConditionalOnBean
- * @see ConditionalOnMissingBean
- * @see ConditionalOnClass
- * @see AutoConfigureAfter
- * @see SpringBootApplication
+ * 该注解就是从classpath中搜寻META-INF/spring.factories配置文件，并将其中
+ * EnableautoConfiguration对应的配置项通过反射实例化为对应的标注了@Configuration的JavaConfig形式的配置类，并加载到IOC容器中
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -81,7 +47,9 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 @Inherited
 @AutoConfigurationPackage // 主要功能自动配置包，它会获取主程序类所在的包路径，并将包路径（包括子包）下的所有组件注册到 Spring IOC 容器中。
 
-@Import(AutoConfigurationImportSelector.class) // 可用于资源的导入。
+// AutoConfigurationImportSelector可以帮助springboot应用将所有符合条件的@Configuration配置
+// 都加载到当前SpringBoot创建并使用的IoC容器(ApplicationContext)中
+@Import(AutoConfigurationImportSelector.class) // 自动配置类扫描导入
 public @interface EnableAutoConfiguration {
 
 	String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";

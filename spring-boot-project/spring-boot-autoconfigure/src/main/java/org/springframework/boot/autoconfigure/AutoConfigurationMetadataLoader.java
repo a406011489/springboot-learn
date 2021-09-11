@@ -28,10 +28,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * 加载自动配置类（AutoConfiguration）的元数据
- * 打个卡
  */
 final class AutoConfigurationMetadataLoader {
 
+	// 这个文件中就包含了需要加载的配置类的路径
 	protected static final String PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
 	private AutoConfigurationMetadataLoader() {
@@ -43,12 +43,16 @@ final class AutoConfigurationMetadataLoader {
 
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader, String path) {
 		try {
-			Enumeration<URL> urls = (classLoader != null) ? classLoader.getResources(path)
-					: ClassLoader.getSystemResources(path);
+			// 读取spring-boot-autoconfigure包下的path信息
+			Enumeration<URL> urls = (classLoader != null) ? classLoader.getResources(path) : ClassLoader.getSystemResources(path);
 			Properties properties = new Properties();
+
+			// 解析url中的信息，并封装成对象并加载
 			while (urls.hasMoreElements()) {
 				properties.putAll(PropertiesLoaderUtils.loadProperties(new UrlResource(urls.nextElement())));
 			}
+
+			// 把封装好的properties对象生成AutoConfigurationMetadata对象返回
 			return loadMetadata(properties);
 		}
 		catch (IOException ex) {

@@ -110,6 +110,10 @@ public abstract class AutoConfigurationPackages {
 
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+
+			// 这个方法就是导入组件类的具体实现 :
+			// 使用Debug模式启动项目，可以看到选中的部分就是com.ly.demo。
+			// 也就是说，@AutoConfigurationPackage注解的主要作用就是将主程序类所在包及所有子包下的组件到扫描到spring容器中。
 			register(registry, new PackageImport(metadata).getPackageName());
 		}
 

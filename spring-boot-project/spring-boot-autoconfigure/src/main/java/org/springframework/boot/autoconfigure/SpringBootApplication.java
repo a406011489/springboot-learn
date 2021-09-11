@@ -48,18 +48,21 @@ import org.springframework.data.repository.Repository;
  * @author Andy Wilkinson
  * @since 1.2.0
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
+@Target(ElementType.TYPE) // 注解的适用范围,Type表示注解可以描述在类、接口、注解或枚举中
+
+@Retention(RetentionPolicy.RUNTIME)// 表示注解的生命周期，Runtime运行时
+
+@Documented // 表示注解可以记录在javadoc中
 
 @Inherited // Java 自带的注解。使用此注解声明出来的自定义注解，在使用此自定义注解时，如果注解在类上面时，子类会自动继承此注解，否则的话，子类不会继承此注解。
 
 @SpringBootConfiguration // 标记这是一个 Spring Boot 配置类。
 
-@EnableAutoConfiguration // Spring Boot 自定义的注解，用于开启自动配置功能，是 spring-boot-autoconfigure 项目最核心的注解。
+@EnableAutoConfiguration // SpringBoot自定义的注解，用于开启自动配置功能，是spring-boot-autoconfigure项目最核心的注解。
 
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
 		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) }) // Spring 自定义的注解,扫描指定路径下的 Component
+
 @ConfigurationPropertiesScan
 public @interface SpringBootApplication {
 

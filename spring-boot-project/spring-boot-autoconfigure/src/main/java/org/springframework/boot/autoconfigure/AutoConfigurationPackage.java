@@ -26,18 +26,16 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
- * Indicates that the package containing the annotated class should be registered with
- * {@link AutoConfigurationPackages}.
+ * AutoConfigurationPackage注解的功能是由@Import注解实现的，它是Spring框架的底层注解，它的作用就是给容器中导入某个组件类
  *
- * @author Phillip Webb
- * @since 1.3.0
- * @see AutoConfigurationPackages
+ * Import(AutoConfigurationPackages.Registrar.class)，它就是将Registrar这个组件类导入到容器中，
+ * 可查看Registrar类中registerBeanDefinitions方法
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import(AutoConfigurationPackages.Registrar.class)
+@Import(AutoConfigurationPackages.Registrar.class) // 导入Registrar中注册的组件
 public @interface AutoConfigurationPackage {
 
 }
