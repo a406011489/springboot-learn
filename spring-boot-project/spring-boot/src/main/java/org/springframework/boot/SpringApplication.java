@@ -217,10 +217,22 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+
+		// 把项目启动类.class设置为属性存储起来
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+
+		// 判断当前webApplicationType应用的类型，主要判断是Servlet应用还是Reactive应用
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
-		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
-		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
+		// 设置初始化器(Initializer),最后会调用这些初始化器
+		// 会使用Spring类加载器SpringFactoriesLoader从META-INF/spring.factories类路径下的META-INF下的spring.factores文件中
+		// 获取所有可用的应用初始化器类ApplicationContextInitializer。
+		this.setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+
+		// 和上述代码一样，只不过这里是设置监听器(Listener)
+		this.setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+
+		// 用于推断并设置项目main()方法启动的主程序启动类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -261,7 +273,7 @@ public class SpringApplication {
 		configureHeadlessProperty();
 
 		// 获得 SpringApplicationRunListener 的数组，并启动监听
-		SpringApplicationRunListeners listeners = getRunListeners(args);
+		SpringApplicationRunListeners listeners = this.getRunListeners(args);
 		listeners.starting();
 		try {
 
@@ -269,6 +281,7 @@ public class SpringApplication {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 
 			// <4> 加载属性配置。执行完成后，所有的 environment 的属性都会加载进来，包括 application.properties 和外部的属性配置。
+			// 根据SpringApplicationRunListeners以及参数来准备环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 
@@ -282,7 +295,7 @@ public class SpringApplication {
 			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
 
-			// <8> 主要是调用所有初始化类的 initialize 方法
+			// <8> 主要是调用所有初始化类的 initialize 方法，相当于spring的前置处理器
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
 
 			// <9> 初始化 Spring 容器。
